@@ -53,10 +53,12 @@ A JavaFX-based General Knowledge Quiz Application built in Java with MySQL datab
    b. **Manual compilation and execution**
    ```bash
    # Compile
-   javac -cp ".;lib/mysql-connector-j-9.3.0.jar" --module-path "C:\Program Files\Java\javafx-sdk-25\lib" --add-modules javafx.controls,javafx.fxml *.java ui/*.java dao/*.java model/*.java
+   # IMPORTANT: You MUST replace "C:\\Program Files\\Java\\javafx-sdk-25\\lib" with the actual path to your JavaFX SDK's lib folder.
+   javac -cp ".;lib/mysql-connector-j-9.3.0.jar" --module-path "C:\\Program Files\\Java\\javafx-sdk-25\\lib" --add-modules javafx.controls,javafx.fxml *.java ui/*.java dao/*.java model/*.java
 
    # Run
-   java --module-path "C:\Program Files\Java\javafx-sdk-25\lib" --add-modules javafx.controls,javafx.fxml -cp ".;lib/mysql-connector-j-9.3.0.jar" QuizApplication
+   # IMPORTANT: You MUST replace "C:\\Program Files\\Java\\javafx-sdk-25\\lib" with the actual path to your JavaFX SDK's lib folder.
+   java --module-path "C:\\Program Files\\Java\\javafx-sdk-25\\lib" --add-modules javafx.controls,javafx.fxml -cp ".;lib/mysql-connector-j-9.3.0.jar" QuizApplication
    ```
 
 ## Security Notes
