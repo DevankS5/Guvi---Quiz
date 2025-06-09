@@ -55,6 +55,11 @@ public class QuizController {
     private int score = 0;
     private static final int SCORE_PER_QUESTION = 10; 
 
+    private static final String STYLE_FEEDBACK_CORRECT = "-fx-text-fill: #2ecc71; -fx-font-weight: bold;";
+    private static final String STYLE_FEEDBACK_INCORRECT = "-fx-text-fill: #e74c3c; -fx-font-weight: bold;";
+    private static final String STYLE_FEEDBACK_PROMPT = "-fx-text-fill: #e74c3c; -fx-font-weight: bold;"; // For "Please select an answer"
+    private static final String MSG_SELECT_ANSWER = "Please select an answer.";
+
     public void initialize() {
         resultsVBox.setVisible(false); 
         resultsVBox.setManaged(false); // Also set managed to false when not visible
@@ -97,6 +102,25 @@ public class QuizController {
             feedbackLabel.setText("Error loading questions: " + e.getMessage());
             feedbackLabel.setStyle("-fx-text-fill: red;");
             questions = Collections.emptyList(); // Ensure questions list is empty on failure
+        }
+
+        // Validate and filter questions
+        List<Question> validQuestions = new java.util.ArrayList<>();
+        if (questions != null) {
+            for (Question q : questions) {
+                if (q.getQuestionText() != null && !q.getQuestionText().isEmpty() &&
+                    q.getOptionA() != null && q.getOptionB() != null && q.getOptionC() != null && q.getOptionD() != null &&
+                    q.getCorrectAnswer() != null && "ABCD".contains(q.getCorrectAnswer().toUpperCase())) {
+                    validQuestions.add(q);
+                } else {
+                    System.err.println("Skipping invalid question: " + q.getQuestionId());
+                }
+            }
+        }
+        this.questions = validQuestions;
+        if (this.questions.isEmpty()) {
+            feedbackLabel.setText("No valid questions available after filtering.");
+            feedbackLabel.setStyle("-fx-text-fill: orange;");
         }
     }
 
@@ -151,8 +175,8 @@ public class QuizController {
         RadioButton selectedRadioButton = (RadioButton) optionsGroup.getSelectedToggle();
 
         if (selectedRadioButton == null) {
-            feedbackLabel.setText("Please select an answer.");
-            feedbackLabel.setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold;");
+            feedbackLabel.setText(MSG_SELECT_ANSWER);
+            feedbackLabel.setStyle(STYLE_FEEDBACK_PROMPT);
             return;
         }
 
@@ -166,10 +190,15 @@ public class QuizController {
         if (currentQuestion.isCorrectAnswer(userAnswer)) {
             score += SCORE_PER_QUESTION;
             feedbackLabel.setText("Correct!");
-            feedbackLabel.setStyle("-fx-text-fill: #2ecc71; -fx-font-weight: bold;");
+            feedbackLabel.setStyle(STYLE_FEEDBACK_CORRECT);
         } else {
-            feedbackLabel.setText("Incorrect. The correct answer was " + getCorrectOptionText(currentQuestion) + ".");
-            feedbackLabel.setStyle("-fx-text-fill: #e74c3c; -fx-font-weight: bold;");
+            String correctAnswerText = getCorrectOptionText(currentQuestion);
+            if (correctAnswerText.contains("Error:")) {
+                feedbackLabel.setText("Incorrect. Problem retrieving correct answer details.");
+            } else {
+                feedbackLabel.setText("Incorrect. The correct answer was " + correctAnswerText + ".");
+            }
+            feedbackLabel.setStyle(STYLE_FEEDBACK_INCORRECT);
         }
         scoreLabel.setText("Score: " + score);
         scoreLabel.setStyle("-fx-font-weight: bold; -fx-text-fill: #27ae60;");
